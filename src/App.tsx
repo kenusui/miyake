@@ -1,35 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  Box,
+  Stack,
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  IconButton,
+} from "@mui/material";
+import MiyakeMap from "./MiyakeMap";
+import { useMemo, useState } from "react";
+import DarkMode from "@mui/icons-material/DarkMode";
+import LightMode from "@mui/icons-material/LightMode";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [mode, setMode] = useState<"light" | "dark">("dark");
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+          primary: { main: "#1976d2" },
+          secondary: { main: "#388e3c" },
+          background: {
+            default: mode === "dark" ? "#181a1b" : "#f5f5f5",
+            paper: mode === "dark" ? "#23272a" : "#fff",
+          },
+        },
+      }),
+    [mode]
+  );
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Stack
+        direction="column"
+        spacing={2}
+        sx={{
+          alignItems: "stretch",
+          width: "100vw",
+          minHeight: "100vh",
+          p: 2,
+        }}
+      >
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          px={2}
+        >
+          <h1 style={{ textAlign: "center", margin: 0, flex: 1 }}>
+            三宅島旅行 工程表マップ
+          </h1>
+          <Box>
+            <IconButton
+              onClick={() => setMode(mode === "light" ? "dark" : "light")}
+            >
+              {mode === "light" ? <DarkMode /> : <LightMode />}
+            </IconButton>
+          </Box>
+        </Box>
+        <MiyakeMap />
+      </Stack>
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
