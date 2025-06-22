@@ -59,10 +59,9 @@ export default function MiyakeMap() {
       <Grid
         size={{ xs: 12, md: 7 }}
         sx={{
-          display: "flex",
+          position: "sticky",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: { xs: 400, md: "100vh" },
         }}
       >
         <Box sx={{ width: "100%", maxWidth: 900 }}>
