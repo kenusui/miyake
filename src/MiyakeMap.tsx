@@ -24,12 +24,26 @@ import { Marker as LeafletMarker } from "leaflet";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { dateSections, miyakeCenter, type Item } from "./ryotei";
 
+import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
 // dateSectionsの全itemsをフラット化してマーカー参照を管理
 const allItemsWithPosition = dateSections
   .flatMap((section) =>
     section.items.map((item) => (item.position ? item : null))
   )
   .filter(Boolean) as Required<Item>[];
+
+// LeafletのデフォルトアイコンのパスをViteビルド後も正しく参照できるように設定
+const DefaultIcon = L.icon({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function MiyakeMap() {
   const markerRefs = useRef<(LeafletMarker | null)[]>([]);
