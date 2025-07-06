@@ -189,6 +189,22 @@ export default function MiyakeMap() {
                           >
                             {item.label}
                           </Typography>
+                          {item.info && (
+                            <Accordion
+                              defaultExpanded={false}
+                              sx={{ boxShadow: "none" }}
+                            >
+                              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  詳細
+                                </Typography>
+                              </AccordionSummary>
+                              <AccordionDetails>{item.info}</AccordionDetails>
+                            </Accordion>
+                          )}
                         </TimelineContent>
                       </TimelineItem>
                     );

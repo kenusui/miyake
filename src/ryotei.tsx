@@ -1,11 +1,15 @@
+import { List, ListItemText } from "@mui/material";
+import type { ReactNode } from "react";
+
 // 三宅島の中心座標（例: 34.0806, 139.5272）
 export const miyakeCenter: [number, number] = [34.0806, 139.5272];
-const kairaku: [number, number] = [34.068258696261104, 139.48270738381026];
+const kr: [number, number] = [34.068258696261104, 139.48270738381026];
 
 export type Item = {
   time: string;
   label: string;
   position?: [number, number];
+  info?: ReactNode;
 };
 
 type Items = Item[];
@@ -18,7 +22,21 @@ const itinerary: Items = [
     label: "レンタカーを借りる",
     position: [34.0636676533408, 139.54998903697486],
   },
-  { time: "5:30", label: "宿「海楽」着", position: kairaku },
+  {
+    time: "5:30",
+    label: "宿「KR」着",
+    position: kr,
+    info: (
+      <List dense={true}>
+        <ListItemText primary={"・1泊2食付き、1名12,000円×4名"} />
+        <ListItemText primary={"・到着日朝食1,500円×4名"} />
+        <ListItemText primary={"・到着日休憩2,000円×4名"} />
+        <ListItemText primary={"・到着日早朝チェックイン1部屋5,000円"} />
+        <ListItemText primary={"・釣り竿レンタル1セット2,000円×4セット"} />
+        <ListItemText primary={"・合計: 75,000円"} />
+      </List>
+    ),
+  },
   { time: "6:00", label: "朝食" },
   { time: "7:00", label: "釣り開始", position: [34.068533, 139.4782826] },
   {
@@ -58,8 +76,8 @@ const itinerary: Items = [
   },
   {
     time: "16:30",
-    label: "宿「海楽」戻り",
-    position: kairaku,
+    label: "宿「KR」戻り",
+    position: kr,
   },
   {
     time: "17:00",
@@ -72,11 +90,6 @@ const itinerary: Items = [
     position: [34.07123177296746, 139.47980353154648],
   },
   { time: "18:00", label: "夕食" },
-  {
-    time: "19:00",
-    label: "温泉「みやけの湯」(21:00 まで営業)",
-    position: [34.07411546262252, 139.4780275133753],
-  },
   { time: "20:00", label: "宿でゆっくり" },
 ];
 
@@ -103,6 +116,11 @@ export const dateSections: { date: string; items: Items }[] = [
         time: "9:00",
         label: "火山体験遊歩道散策",
         position: [34.07908775336427, 139.48072336495062],
+      },
+      {
+        time: "11:00",
+        label: "温泉「みやけの湯」(21:00 まで営業)",
+        position: [34.07411546262252, 139.4780275133753],
       },
       { time: "13:45", label: "三宅島発", position: [34.068533, 139.4782826] },
       { time: "19:45", label: "竹芝桟橋着" },
