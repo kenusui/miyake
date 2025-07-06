@@ -19,22 +19,15 @@ import {
   Stack,
   Box,
 } from "@mui/material";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Marker as LeafletMarker, Map } from "leaflet";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { dateSections, miyakeCenter, type Item } from "./ryotei";
+import { dateSections, miyakeCenter } from "./ryotei";
 
 import L from "leaflet";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-// dateSectionsの全itemsをフラット化してマーカー参照を管理
-const allItemsWithPosition = dateSections
-  .flatMap((section) =>
-    section.items.map((item) => (item.position ? item : null))
-  )
-  .filter(Boolean) as Required<Item>[];
 
 // LeafletのデフォルトアイコンのパスをViteビルド後も正しく参照できるように設定
 const DefaultIcon = L.icon({
@@ -45,9 +38,24 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// sectionIdx, idx からグローバルなマーカーインデックスを取得する関数
+function getFlatMarkerIndex(sectionIdx: number, idx: number): number {
+  return (
+    dateSections
+      .slice(0, sectionIdx)
+      .reduce((acc, s) => acc + s.items.filter((i) => i.position).length, 0) +
+    dateSections[sectionIdx].items.slice(0, idx).filter((i) => i.position)
+      .length
+  );
+}
+
 export default function MiyakeMap() {
   const markerRefs = useRef<(LeafletMarker | null)[]>([]);
   const mapRef = useRef<Map | null>(null);
+  // 日付ごとのマーカー表示状態
+  const [visibleDates, setVisibleDates] = useState<string[]>(
+    dateSections.map((section) => section.date)
+  );
 
   return (
     <Grid
@@ -76,20 +84,28 @@ export default function MiyakeMap() {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {allItemsWithPosition.map((item, idx) => (
-              <Marker
-                key={idx}
-                position={item.position}
-                ref={(ref) => {
-                  markerRefs.current[idx] =
-                    ref && "openPopup" in ref ? ref : null;
-                }}
-              >
-                <Popup>
-                  <b>{item.time}</b> {item.label}
-                </Popup>
-              </Marker>
-            ))}
+            {dateSections.map((section, sectionIdx) =>
+              visibleDates.includes(section.date)
+                ? section.items.map(
+                    (item, idx) =>
+                      item.position && (
+                        <Marker
+                          key={`${section.date}-${idx}`}
+                          position={item.position}
+                          ref={(ref) => {
+                            const flatIdx = getFlatMarkerIndex(sectionIdx, idx);
+                            markerRefs.current[flatIdx] =
+                              ref && "openPopup" in ref ? ref : null;
+                          }}
+                        >
+                          <Popup>
+                            <b>{item.time}</b> {item.label}
+                          </Popup>
+                        </Marker>
+                      )
+                  )
+                : null
+            )}
           </MapContainer>
         </Box>
       </Grid>
@@ -97,15 +113,23 @@ export default function MiyakeMap() {
         <Typography variant="h6" gutterBottom>
           工程表タイムライン
         </Typography>
-
-        {dateSections.map((section) => (
-          <Accordion key={section.date} defaultExpanded={false}>
+        {dateSections.map((section, sectionIdx) => (
+          <Accordion
+            key={section.date}
+            defaultExpanded={visibleDates.includes(section.date)}
+            onChange={(_, expanded) => {
+              setVisibleDates((prev) =>
+                expanded
+                  ? [...prev, section.date]
+                  : prev.filter((d) => d !== section.date)
+              );
+            }}
+          >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1" color="primary">
                 {section.date}
               </Typography>
             </AccordionSummary>
-
             <AccordionDetails>
               <Stack sx={{ justifyContent: "flex-start" }}>
                 <Timeline
@@ -121,10 +145,10 @@ export default function MiyakeMap() {
                   }}
                 >
                   {section.items.map((item, idx) => {
-                    const markerIdx = allItemsWithPosition.findIndex(
-                      (it) => it.time === item.time && it.label === item.label
-                    );
-                    const hasMarker = markerIdx !== -1;
+                    const flatIdx = getFlatMarkerIndex(sectionIdx, idx);
+                    const markerIdx = item.position ? flatIdx : -1;
+                    const hasMarker =
+                      markerIdx !== -1 && visibleDates.includes(section.date);
                     return (
                       <TimelineItem key={idx}>
                         <TimelineOppositeContent>
@@ -141,11 +165,7 @@ export default function MiyakeMap() {
                             variant="body1"
                             sx={{
                               cursor: hasMarker ? "pointer" : "default",
-                              "&:hover": {
-                                textDecoration: hasMarker
-                                  ? "underline"
-                                  : "none",
-                              },
+                              textDecoration: hasMarker ? "underline" : "none",
                             }}
                             onClick={() => {
                               if (hasMarker && markerRefs.current[markerIdx]) {
