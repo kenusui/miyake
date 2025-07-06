@@ -20,7 +20,7 @@ import {
   Box,
 } from "@mui/material";
 import { useRef } from "react";
-import { Marker as LeafletMarker } from "leaflet";
+import { Marker as LeafletMarker, Map } from "leaflet";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { dateSections, miyakeCenter, type Item } from "./ryotei";
 
@@ -47,6 +47,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function MiyakeMap() {
   const markerRefs = useRef<(LeafletMarker | null)[]>([]);
+  const mapRef = useRef<Map | null>(null);
 
   return (
     <Grid
@@ -69,6 +70,7 @@ export default function MiyakeMap() {
             center={miyakeCenter}
             zoom={12}
             style={{ height: "600px", width: "100%" }}
+            ref={mapRef}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -139,11 +141,21 @@ export default function MiyakeMap() {
                             variant="body1"
                             sx={{
                               cursor: hasMarker ? "pointer" : "default",
-                              textDecoration: hasMarker ? "underline" : "none",
+                              "&:hover": {
+                                textDecoration: hasMarker
+                                  ? "underline"
+                                  : "none",
+                              },
                             }}
                             onClick={() => {
                               if (hasMarker && markerRefs.current[markerIdx]) {
-                                markerRefs.current[markerIdx]?.openPopup();
+                                const marker = markerRefs.current[markerIdx];
+                                const map = mapRef.current;
+                                if (marker && map) {
+                                  const { lat, lng } = marker.getLatLng();
+                                  map.flyTo([lat, lng], 15);
+                                  marker.openPopup();
+                                }
                               }
                             }}
                           >
