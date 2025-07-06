@@ -49,7 +49,7 @@ function App() {
           px={2}
         >
           <h1 style={{ textAlign: "center", margin: 0, flex: 1 }}>
-            三宅島旅行 工程表マップ
+            三宅島旅程
           </h1>
           <Box>
             <IconButton

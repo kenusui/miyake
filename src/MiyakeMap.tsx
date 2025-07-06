@@ -34,6 +34,11 @@ const DefaultIcon = L.icon({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize: [41, 41],
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -53,10 +58,7 @@ export default function MiyakeMap() {
   const markerRefs = useRef<(LeafletMarker | null)[]>([]);
   const mapRef = useRef<Map | null>(null);
   // 日付ごとのマーカー表示状態
-  const [visibleDates, setVisibleDates] = useState<string[]>(
-    dateSections.map((section) => section.date)
-  );
-
+  const [visibleDates, setVisibleDates] = useState<string[]>([]);
   return (
     <Grid
       container
@@ -116,7 +118,7 @@ export default function MiyakeMap() {
         {dateSections.map((section, sectionIdx) => (
           <Accordion
             key={section.date}
-            defaultExpanded={visibleDates.includes(section.date)}
+            defaultExpanded={false}
             onChange={(_, expanded) => {
               setVisibleDates((prev) =>
                 expanded
