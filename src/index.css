@@ -70,3 +70,7 @@ button:focus-visible {
 .icon-red {
   filter: hue-rotate(150deg);
 }
+
+.icon-green {
+  filter: hue-rotate(300deg);
+}
