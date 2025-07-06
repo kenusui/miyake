@@ -25,21 +25,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { dateSections, miyakeCenter } from "./ryotei";
 
 import L from "leaflet";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-// LeafletのデフォルトアイコンのパスをViteビルド後も正しく参照できるように設定
-const DefaultIcon = L.icon({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-  shadowSize: [41, 41],
-});
+import { DefaultIcon } from "./icons";
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -113,7 +99,7 @@ export default function MiyakeMap() {
       </Grid>
       <Grid size={{ xs: 12, md: 4 }}>
         <Typography variant="h6" gutterBottom>
-          工程表タイムライン
+          タイムライン
         </Typography>
         {dateSections.map((section, sectionIdx) => (
           <Accordion

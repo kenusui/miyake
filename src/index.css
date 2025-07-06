@@ -66,3 +66,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.icon-red {
+  filter: hue-rotate(150deg);
+}
